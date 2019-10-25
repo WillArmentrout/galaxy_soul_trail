@@ -162,3 +162,13 @@ footer p {
   bottom: 0;
 }
 
+#caption {
+  position: absolute;
+  font-size: 200%;
+  bottom: 50px;
+  width: 100%;
+  text-align: center;
+  z-index: 100;
+  display:block;  
+
+}

@@ -5,15 +5,23 @@ var Starfield = (function() {
   var camera, scene, renderer;
   var starfield;
   var mouseX = 0, mouseY = 0;
+  var starfieldY = 0;//, starfieldY = 0;
+  var year = 2019;
+  var dateIndex = 1;
+  var caption;
+  var dateTable;
 
   function initialize(element) {
     container = ( typeof element == 'string') ? document.getElementById(element) : element;
     measure();
     setupCamera();
     setupScene();
+    setupDates();
     createRenderer();
 
     // Event listeners
+    //$(window).wheel(onScroll);
+    document.addEventListener('wheel', onScroll);
     $(document).mousemove(onMouseMove);
     $(window).resize(onResize);
   }
@@ -55,6 +63,18 @@ var Starfield = (function() {
       scene = new THREE.Scene();
       scene.addObject( starfield );
     }
+  }
+
+
+  function setupDates(){
+      d3.text('http://localhost/galaxy_soul_trail/data/singleEvents_Coords.csv')
+      .then( text => d3.csvParseRows(text) )
+      .then( d => {dateTable = d;} )
+      ;
+
+
+      caption = d3.select("#caption");
+
   }
 
   function createRenderer() {
@@ -123,6 +143,26 @@ var Starfield = (function() {
     mouseY = e.clientY - windowHalfHeight;
   }
 
+  function onScroll(e){
+    year += e.deltaY;
+    starfieldY += e.deltaY * 0.01;
+
+    updateDateIndex(e.deltaY)
+    
+    caption.text(dateTable[dateIndex][1] + " - " + dateTable[dateIndex][2]);
+    //console.log(year);
+  }
+
+  function updateDateIndex(amount){
+    dateIndex += amount
+    if ( dateIndex < 1 ){
+      dateIndex = 1;
+    }
+    if(dateIndex > 200){
+      dateIndex = 200;
+    }
+  }
+
   function onResize() {
     measure();
 
@@ -141,13 +181,18 @@ var Starfield = (function() {
   }
 
   function render() {
-    /*
+    
     camera.position.x += ( mouseX - camera.position.x ) * 0.05;
     camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
+    starfield.rotation.y = starfieldY;
+    //starfield.rotation.y = starfieldX;
+
+    /*
     starfield.rotation.x += 0.005;
     starfield.rotation.y += 0.01;
-	*/
+    */
+    //caption.text(dateTable[1][0]);
 	
     renderer.render( scene, camera );
   }
